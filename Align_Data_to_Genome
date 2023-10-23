@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=hisat2_St5_File_Name
+#SBATCH --job-name=hisat2_file_name
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
@@ -23,7 +23,7 @@ module load SAMtools/0.1.20-GCC-11.2.0
 echo -e "\n** Script started on `date` **\n"
 echo -e "\n** Mapping reads to reference genome **\n"
 
-time hisat2 \ --summary-file hisat2_St5_File_summary.txt -x AnoSag2.1_PGA_Y_ube2l3up_hardmasked_hisat2.idx \ -1 fastq_R1.fastq.gz -2 fastq_R2.fastq.gz -S samfile_hisat2.sam
+time hisat2 \ --summary-file hisat2_file_name_summary.txt -x AnoSag2.1_PGA_Y_ube2l3up_hardmasked_hisat2.idx \ -1 fastq_R1.fastq.gz -2 fastq_R2.fastq.gz -S samfile_hisat2.sam
 
 echo -e "\n** convert output sam to sorted bam and extract mapped reads **\n"
 
