@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --job-name=Merging_FastQC_Files
+#SBATCH --partition=batch
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=50G
+#SBATCH --time=4:00:00
+#SBATCH --export=NONE
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+#SBATCH --mail-user=mkm74152@uga.edu
+#SBATCH --mail-type=ALL
+
+cd $SLURM_SUBMIT_DIR
+
+cat fastqfile1.fastq.gz fastqfile2.fastq.gz > mergedfastq.fastq.gz
+cat ...
+cat ...
+cat ...
