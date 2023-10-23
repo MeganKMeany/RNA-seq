@@ -1,0 +1,15 @@
+Download files from basespace to lab server using lab computer
+
+# using the terminal
+Move fastq files (fastq.gz), genome (.fa and .fai), and annotation file (gtf) to cluster using sftp or scp
+Run FastQC on fastq files to check for quality of data
+Index the genome, generate .idx files
+Align data to indexed genome using Samtools, generate .bam files
+Use bam files for all downstream analyses in R Studio
+
+# using R Studio
+Run Feature Counts pipeline, generate matrices to be used for deseq2
+Run DESeq2 pipeline, generate normalized counts and DEGs
+Run PCA plot pipeline
+Run other analyses- bar plot, venn diagram,volcano plot, GO, HC, etc
+# save environment for each analysis 
