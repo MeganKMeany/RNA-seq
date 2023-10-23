@@ -2,9 +2,10 @@ Download files from basespace to lab server using lab computer
 
 # using the terminal
 Move fastq files (fastq.gz), genome (.fa and .fai), and annotation file (gtf) to cluster using sftp or scp
-Run FastQC on fastq files to check for quality of data
-Index the genome, generate .idx files
-Align data to indexed genome using Samtools, generate .bam files
+Run FastQC on fastq files to check for quality of data (use Run_FastQC)
+Index the genome, generate .idx files (use Indexing_Genome)
+If you need to merge fastq files, merge before aligning (use Merge_Fastq)
+Align data to indexed genome using Samtools, generate .bam files (use Align_Data_to_Genome)
 Use bam files for all downstream analyses in R Studio
 
 # using R Studio
