@@ -1,0 +1,17 @@
+#SBATCH --mail-user=mkm74152@uga.edu 
+#SBATCH --mail-type=ALL
+
+cd $SLURM_SUBMIT_DIR
+
+GENOME=/scratch/mkm74152/workDir
+
+ml purge
+module load HISAT2/2.1.0-foss-2019b
+
+echo -e "\n** Script started in 'date' **\n"
+
+time hisat2-build AnoSag2.1_PGA_Y.fa AnoSag2.1_PGA_Y_hisat2.idx
+
+echo -e "\n** Script ended on `date` **\n"
+echo Done!
+
