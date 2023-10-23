@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --job-name=hisat2_St5_File_Name
+#SBATCH --partition=batch
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=50G
+#SBATCH --time=24:00:00
+#SBATCH --export=NONE
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+#SBATCH --mail-user=mkm74152@uga.edu
+#SBATCH --mail-type=ALL
+
+cd $SLURM_SUBMIT_DIR
+
+GENOME_INDEX=/scratch/mkm74152/workDir
+FASTQ=/scratch/mkm74152/workDir
+
+ml purge
+module load HISAT2/2.2.1-gompi-2022a
+module load SAMtools/0.1.20-GCC-11.2.0
+
+echo -e "\n** Script started on `date` **\n"
+echo -e "\n** Mapping reads to reference genome **\n"
+
+time hisat2 \ --summary-file hisat2_St5_File_summary.txt -x AnoSag2.1_PGA_Y_ube2l3up_hardmasked_hisat2.idx \ -1 fastq_R1.fastq.gz -2 fastq_R2.fastq.gz -S samfile_hisat2.sam
+
+echo -e "\n** convert output sam to sorted bam and extract mapped reads **\n"
+
+time samtools view -Sb samfile_hisat2.sam | samtools sort - samfile_hisat2.sorted
+
+echo -e "\n** Script ended on `date` **\n"
+echo Done!
+
+# output is bam file
