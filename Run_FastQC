@@ -1,0 +1,30 @@
+#!/bin/bash
+#SBATCH --job-name=fastQC_file_name
+#SBATCH --partition=batch
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=50G
+#SBATCH --time=24:00:00
+#SBATCH --export=NONE
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+#SBATCH --mail-user=mkm74152@uga.edu 
+#SBATCH --mail-type=ALL
+
+# Use the current directory as working directory
+cd $SLURM_SUBMIT_DIR
+
+#make directory
+mkdir FastQC_output
+
+# Load
+module load FastQC/0.11.9-Java-11
+
+# Run loaded program 
+echo -e "\n** Script started on `date` **"
+
+time fastqc -o FastQC_output_filename ./ fastqfile.fastq.gz
+
+echo -e "\n** Script ended on `date` **"
+echo Done!
+
