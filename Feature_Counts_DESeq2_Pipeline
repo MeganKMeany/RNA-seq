@@ -41,35 +41,29 @@ fcS5 <- featureCounts(files=flsS5,
                        requireBothEndsMapped = FALSE,
                        strandSpecific = 2)
 
-#extract count matrix from fc object, name of your object so here its fcS7 for feature counts stage 7
+#extract count matrix from fc object
 count_matrix_S5 <- as.matrix(fcS5$count)
 dim(count_matrix_S5)
 
 #enter sample names in order
-#testing out PCA for all with female/male order for stage 9
 colnames (count_matrix_S5) <- c("5.1 XX", "5.1 XY", "5.2 XX", "5.2 XY", "5.3 XX", "5.3 XY", "5.4 XX", "5.4 XY", "5.5 XX", "5.5 XY")
 #make DESeq object from count matrix
 library ("DESeq2")
-#path to sample info, create excel file with info on samples, must be csv file, move to cluster with filezilla
+#path to sample info, create excel file with info on samples, must be csv file, move to cluster 
 colDataS5 <- read.csv("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/Sample_Info_Stage_5.csv", row.names = 1)
 
 #check naming bw colData and count matrix
 all(rownames(colDataS5) %in% colnames(count_matrix_S5))
 #TRUE
 
-all(rownames(colDataS5) == colnames(count_matrix_S5))
-#TRUE
-
 #Time for DESeq!!
 #put in your labels for the commands, design = genotype from your colData (dont forget the character!!)
 ddsS5 <- DESeqDataSetFromMatrix(countData = count_matrix_S5, colData = colDataS5, design = ~ Sex)
 
-#not sure why its unhappy with my csv file, not using any special characters 
-
 #Generate normalized count matrix
 ddsS5 <- estimateSizeFactors(ddsS5)
 dds_normS5 <- counts(ddsS5, normalized=TRUE)
-write.csv(as.data.frame(dds_normS5), file="DESeq2_normalized_counts_Stage5_Sep_15_2023.csv", row.names = TRUE)
+write.csv(as.data.frame(dds_normS5), file="DESeq2_normalized_counts_St5_9_15_2023.csv", row.names = TRUE)
 
 
 #make the reference (control or untreated samples) as first level for selected column name (genotype/tissue) from sample info
@@ -90,9 +84,9 @@ summary(res_sortedS5)
 
 
 #save the results table for downstream analysis
-write.csv(as.data.frame(res_sortedS5), file="DESeq2_padj_0.05_St5_Sept_15_2023.csv", row.names = TRUE)
+write.csv(as.data.frame(res_sortedS5), file="DESeq2_padj_0.05_St5_9_15_2023.csv", row.names = TRUE)
 
 #DONE!!
 
 #save workspace via environment tab or command below
-save.image("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/Stage5_Enviroment_Sept_15_2023.RData")
+save.image("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/Environment_St5_9_15_2023.RData")
