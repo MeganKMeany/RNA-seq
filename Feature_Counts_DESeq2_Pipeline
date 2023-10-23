@@ -1,0 +1,98 @@
+# Feature Counts and DESeq2 Pipeline used for St5 XX to XY on Sept 15 2023:
+
+#Diff gene expression analysis pipeline, files should be Bam
+#starting point after fastqc, hisat2
+#using ondemand uga or Rstudio on lab/personal computer 
+
+#install Rsubread for Feature Counts
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("Rsubread")
+
+#install DESeq2 package
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("DESeq2")
+
+#set working directory (path to Bam files), don't forget quotation marks
+setwd("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam")
+dir()
+
+#list files you want to use
+flsS5 <- list.files("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/", pattern = "bam$", full.names = TRUE)
+
+#view files
+flsS5
+
+#need to load to library for feature counts to work
+library("Rsubread")
+
+#feature counts needs annotation file, remember to add isPairedEnd=TRUE for your data (can exclude this if using SE reads)
+print(Sys.time())
+fcS5 <- featureCounts(files=flsS5,
+                       annot.ext="/scratch/mkm74152/workDir/St5_RNAseq/AnoSag2.1_PGA_Y_gene_annotation_for_Megan_081623.gtf", 
+                       isGTFAnnotationFile=TRUE, 
+                       isPairedEnd=TRUE, 
+                       GTF.featureType="exon",
+                       GTF.attrType = "gene_id",
+                       checkFragLength = FALSE, 
+                       requireBothEndsMapped = FALSE,
+                       strandSpecific = 2)
+
+#extract count matrix from fc object, name of your object so here its fcS7 for feature counts stage 7
+count_matrix_S5 <- as.matrix(fcS5$count)
+dim(count_matrix_S5)
+
+#enter sample names in order
+#testing out PCA for all with female/male order for stage 9
+colnames (count_matrix_S5) <- c("5.1 XX", "5.1 XY", "5.2 XX", "5.2 XY", "5.3 XX", "5.3 XY", "5.4 XX", "5.4 XY", "5.5 XX", "5.5 XY")
+#make DESeq object from count matrix
+library ("DESeq2")
+#path to sample info, create excel file with info on samples, must be csv file, move to cluster with filezilla
+colDataS5 <- read.csv("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/Sample_Info_Stage_5.csv", row.names = 1)
+
+#check naming bw colData and count matrix
+all(rownames(colDataS5) %in% colnames(count_matrix_S5))
+#TRUE
+
+all(rownames(colDataS5) == colnames(count_matrix_S5))
+#TRUE
+
+#Time for DESeq!!
+#put in your labels for the commands, design = genotype from your colData (dont forget the character!!)
+ddsS5 <- DESeqDataSetFromMatrix(countData = count_matrix_S5, colData = colDataS5, design = ~ Sex)
+
+#not sure why its unhappy with my csv file, not using any special characters 
+
+#Generate normalized count matrix
+ddsS5 <- estimateSizeFactors(ddsS5)
+dds_normS5 <- counts(ddsS5, normalized=TRUE)
+write.csv(as.data.frame(dds_normS5), file="DESeq2_normalized_counts_Stage5_Sep_15_2023.csv", row.names = TRUE)
+
+
+#make the reference (control or untreated samples) as first level for selected column name (genotype/tissue) from sample info
+ddsS5$Sex <- relevel(ddsS5$Sex, "Female")
+
+#filter out genes with low numbers of reads 
+ddsS5 <- ddsS5[rowSums(counts(ddsS5)) > 1, ]
+
+#Run diff expression pipeline
+deseq_ddsS5 <- DESeq(ddsS5)
+
+#build results table at selected significance level and sort them by selected column of the results table (eg padj)
+resS5 <- results(deseq_ddsS5, alpha = 0.05)
+res_sortedS5 <- resS5[order(resS5$padj),]
+
+#display summary of the results 
+summary(res_sortedS5)
+
+
+#save the results table for downstream analysis
+write.csv(as.data.frame(res_sortedS5), file="DESeq2_padj_0.05_St5_Sept_15_2023.csv", row.names = TRUE)
+
+#DONE!!
+
+#save workspace via environment tab or command below
+save.image("/scratch/mkm74152/workDir/St5_RNAseq/St5_Bam/Stage5_Enviroment_Sept_15_2023.RData")
